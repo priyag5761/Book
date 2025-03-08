@@ -1,0 +1,32 @@
+[
+  {
+    "Books": "Wings of Fire",
+    "Authors": "A.P.J.Abdul Kalam",
+    "Price": 495,
+    "Sales": "27M"
+  },
+  {
+    "Books": "The Power of Thoughts",
+    "Authors": "Swami Mukundananda",
+    "Price": 215,
+    "Sales": "10M"
+  },
+  {
+    "Books": "The Secret Garden",
+    "Authors": "Frances Hodgson Burnett",
+    "Price": 175,
+    "Sales": "1M"
+  },
+  {
+    "Books": "The Power of Habit",
+    "Authors": "Charles Duchigg",
+    "Price": 173,
+    "Sales": "3M"
+  },
+  {
+    "Books": "Wild Fictions:Essays",
+    "Authors": "Amitav Ghosh",
+    "Price": 790,
+    "Sales": "8M"
+  }
+]
