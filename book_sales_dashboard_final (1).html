@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Selling Books Result Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #ffdee9; /* Icy Pink */
+            background: linear-gradient(to right, #ffdee9, #b5fffc);
+        }
+        .container {
+            width: 90%;
+            margin: auto;
+            padding: 20px;
+        }
+        .upload-section {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .chart-container {
+            width: 100%;
+            position: relative;
+        }
+        .chart {
+            width: 50%;
+            margin: auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+        .nav-buttons {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Best Selling Books Result Analysis</h1>
+        <div class="upload-section">
+            <input type="file" id="fileInput" accept=".json">
+            <button onclick="processFile()">Upload & Generate Dashboard</button>
+        </div>
+        <div class="chart-container">
+            <div class="chart" id="salesByBook"></div>
+            <div class="chart" id="authorSales"></div>
+            <div class="chart" id="priceVsSales"></div>
+            <div class="chart" id="salesByPrice"></div>
+            <div class="chart" id="bubbleChart"></div>
+        </div>
+        <div class="nav-buttons">
+            <button onclick="prevChart()">Previous</button>
+            <button onclick="nextChart()">Next</button>
+        </div>
+    </div>
+
+    <script>
+        let currentChart = 0;
+        let charts = [];
+        
+        function processFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) return alert("Please select a JSON file!");
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const data = JSON.parse(event.target.result);
+                generateDashboard(data);
+            };
+            reader.readAsText(file);
+        }
+
+        function generateDashboard(data) {
+            charts = ["salesByBook", "authorSales", "priceVsSales", "salesByPrice", "bubbleChart"];
+            $(".chart").hide();
+            
+            const books = data.map(d => d.Books);
+            const sales = data.map(d => parseFloat(d.Sales.replace('M', '')) * 1e6);
+            const prices = data.map(d => d.Price);
+            const authors = data.map(d => d.Authors);
+
+            // Bar Chart: Sales by Book Name
+            Plotly.newPlot('salesByBook', [{ x: books, y: sales, type: 'bar', marker: { color: 'blue' }}], { title: 'Sales by Book Name' });
+            
+            // Pie Chart: Sales by Author
+            Plotly.newPlot('authorSales', [{ labels: authors, values: sales, type: 'pie', hole: 0.3 }], { title: 'Sales by Author' });
+            
+            // Line Chart: Price vs Sales
+            Plotly.newPlot('priceVsSales', [{ x: prices, y: sales, mode: 'lines+markers', type: 'scatter', marker: { size: 10, color: sales, opacity: 0.8 }}], { title: 'Price vs Sales (Line Chart)' });
+            
+            // Area Chart: Sales Distribution by Price
+            Plotly.newPlot('salesByPrice', [{ x: prices, y: sales, fill: 'tozeroy', type: 'scatter', marker: { color: 'purple' }}], { title: 'Sales Distribution by Price' });
+            
+            // 3D Bubble Chart: Price vs Sales vs Authors (Brown Color)
+            Plotly.newPlot('bubbleChart', [{ x: prices, y: sales, z: authors.map((_, i) => i + 1), mode: 'markers', marker: { size: sales.map(s => s / 1e6), color: 'brown', opacity: 0.8 }}], { title: 'Price vs Sales vs Authors' });
+            
+            showChart(0);
+        }
+
+        function showChart(index) {
+            $(".chart").hide();
+            $("#" + charts[index]).fadeIn(500);
+        }
+
+        function nextChart() {
+            currentChart = (currentChart + 1) % charts.length;
+            showChart(currentChart);
+        }
+
+        function prevChart() {
+            currentChart = (currentChart - 1 + charts.length) % charts.length;
+            showChart(currentChart);
+        }
+    </script>
+</body>
+</html>
